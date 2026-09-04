@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kazuki.dev/schemas/payloads/memo-note.v0.schema.json",
+  "title": "Trace Memo Note Payload v0",
+  "type": "object",
+  "required": ["projectId", "title", "content", "status"],
+  "properties": {
+    "projectId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "content": { "type": "string" },
+    "status": { "enum": ["active", "paused", "done"] }
+  },
+  "additionalProperties": false
+}
