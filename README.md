@@ -55,3 +55,14 @@ npm run deploy
 
 共通外枠は `schemas/envelope.v0.schema.json`、メモ固有のpayloadは
 `schemas/payloads/memo-note.v0.schema.json` を正本とする。
+
+### Import ID policy
+
+インポート時は、正常かつ一意な既存IDを維持する。全件を一律に再採番しない。
+
+- IDがない場合はUUIDv7を自動採番する。
+- IDの形式が不正な場合はUUIDv7へ自動再採番する。
+- 同一インポート内でIDが重複した場合は最初のレコードのIDを維持し、後続レコードを自動再採番する。
+- 保存済みデータとIDが衝突した場合、内容が同一なら同一データとして扱い、内容が異なる場合はインポート対象を自動再採番する。
+- 再採番した場合は、旧ID、新ID、再採番理由をインポート結果へ記録する。
+- 元ツール内のIDを保持する必要がある場合は `origin.localId` に保存する。
