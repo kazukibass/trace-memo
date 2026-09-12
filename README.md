@@ -2,11 +2,25 @@
 
 現在のメモだけでなく、関連するデータと作業の経過を時間軸で追う個人用ワークスペース。
 
+## Delivery strategy: static first
+
+Trace Memoの本体は、静的ページだけで使えるローカルファーストのメモアプリとする。
+React/TypeScriptをViteでHTML・CSS・JavaScriptへビルドし、既定の保存先にはブラウザの
+IndexedDBを使う。常時稼働するAPIやD1がなくても、作成・編集・履歴・時間軸・JSON出力を
+利用できることを最初の完成条件とする。
+
+Cloudflare WorkersとD1は削除せず、端末間同期、バックアップ、認証、共有など、静的ページ
+だけでは担えない機能を後から補う層として扱う。UIは保存先を直接呼ばず`MemoRepository`
+だけに依存し、将来の同期追加で画面を作り直さない。
+
+詳しい境界と移行規則は[`docs/architecture/static-first.md`](docs/architecture/static-first.md)を参照。
+
 ## Stack
 
 - React + Vite
-- Cloudflare Workers + Hono
-- Cloudflare D1
+- IndexedDB（既定のローカル保存）
+- Cloudflare Workers + Hono（将来の動的補助）
+- Cloudflare D1（将来の同期先）
 - TypeScript + Zod + JSON Schema
 
 ## Data axes
@@ -22,7 +36,6 @@
 
 ```bash
 npm install
-npm run db:migrate:local
 npm run dev
 ```
 
@@ -34,7 +47,11 @@ npm test
 npm run build
 ```
 
-## First deployment
+## Static deployment
+
+`npm run build`の成果物`dist/`はGitHub Pagesなどの静的ホスティングへ配置できる。
+
+## Optional dynamic deployment
 
 ```bash
 npx wrangler login
@@ -45,7 +62,7 @@ npx wrangler d1 create trace-memo-db
 
 ```bash
 npm run db:migrate:remote
-npm run deploy
+npm run deploy:worker
 ```
 
 本アプリは個人用のため、公開後にCloudflare AccessでWorker全体を保護する。
