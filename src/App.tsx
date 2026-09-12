@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { Note, NoteRevision, NoteStatus, ProjectDetail, ProjectSummary } from "../shared/types";
-import { api } from "./api";
+import { api, downloadBlob } from "./data";
 
 const statusLabel: Record<NoteStatus, string> = { active: "進行中", paused: "保留", done: "完了" };
 const eventLabel: Record<string, string> = {
@@ -60,7 +60,10 @@ function App() {
             </button>
           ))}
         </nav>
-        <footer><span className="pulse" /> Cloudflare ready</footer>
+        <footer>
+          <span className="pulse" /> この端末に保存
+          <button className="backup-button" onClick={async () => downloadBlob(await api.exportAll(), `trace-memo-${new Date().toISOString().slice(0, 10)}.json`)}>バックアップ</button>
+        </footer>
       </aside>
 
       <main>
@@ -113,7 +116,7 @@ function ProjectView({ project, onNewNote, onEditNote, onHistory, onDelete, onEv
         <div className="notes-grid">{project.notes.map((note) => <article className="note-card" key={note.id}>
           <div className={`status ${note.status}`}>{statusLabel[note.status]}</div><h3>{note.title}</h3><p>{note.content || "本文はありません"}</p>
           <time>{new Date(note.updatedAt).toLocaleString("ja-JP")}</time>
-          <div className="note-actions"><button onClick={() => onEditNote(note)}>編集</button><button onClick={() => onHistory(note)}>履歴</button><a href={`/api/notes/${note.id}/export`}>JSON</a><button className="danger" onClick={() => onDelete(note)}>削除</button></div>
+          <div className="note-actions"><button onClick={() => onEditNote(note)}>編集</button><button onClick={() => onHistory(note)}>履歴</button><button onClick={async () => downloadBlob(await api.exportNote(note.id), `${note.id}.json`)}>JSON</button><button className="danger" onClick={() => onDelete(note)}>削除</button></div>
         </article>)}</div>
         {!project.notes.length && <div className="empty-panel">まだメモがありません。現在地を書き残しましょう。</div>}
       </section>
