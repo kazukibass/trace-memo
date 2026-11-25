@@ -167,7 +167,7 @@ function Dialog({ children, onClose, className = "" }: { children: ReactNode; on
 }
 
 function ProjectDialog({ onClose, onSave }: { onClose: () => void; onSave: (input: { name: string; description: string }) => Promise<void> }) {
-  return <Dialog onClose={onClose}><p className="eyebrow">NEW PROJECT</p><h2>プロジェクトを作成</h2><form onSubmit={async (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); await onSave({ name: String(data.get("name")), description: String(data.get("description")) }); }}><label>プロジェクト名<input name="name" required maxLength={120} autoFocus /></label><label>説明<textarea name="description" /></label><button type="submit">作成する</button></form></Dialog>;
+  return <Dialog onClose={onClose}><p className="eyebrow">NEW PROJECT</p><h2>プロジェクトを作成</h2><form onSubmit={async (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); await onSave({ name: String(data.get("name")), description: String(data.get("description")) }); }}><label>プロジェクト名<input name="name" required maxLength={120} /></label><label>説明<textarea name="description" /></label><button type="submit">作成する</button></form></Dialog>;
 }
 
 function NoteDialog({ note, onClose, onSave }: { note: Note | null; onClose: () => void; onSave: (input: { title: string; content: string; status: NoteStatus }) => Promise<void> }) {
