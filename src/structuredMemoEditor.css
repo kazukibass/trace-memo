@@ -1,0 +1,40 @@
+.structured-memo { min-width: 0; display: grid; gap: 9px; }
+.structured-memo-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #5d665f; font-weight: 600; font-size: 12px; }
+.structured-memo-modes { flex: none; display: flex; padding: 3px; gap: 3px; background: #eceee6; border: 1px solid #dedfd6; border-radius: 9px; }
+.structured-memo-modes button { min-height: 36px; padding: 6px 13px; color: #526157; border: 0; background: transparent; border-radius: 6px; }
+.structured-memo-modes button[aria-pressed="true"] { color: #fff; background: #31553d; }
+.structured-memo-help { color: #59665d; font-size: 12px; line-height: 1.65; margin: 0; overflow-wrap: anywhere; }
+.structured-memo-count { margin: 2px 0; font-size: 12px; font-weight: 600; color: #31553d; }
+.structured-memo-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: left; font-size: 12px; }
+.structured-memo-number-col { width: 42px; }
+.structured-memo-group-col { width: 72px; }
+.structured-memo-table th { padding: 5px 2px 7px; color: #59665d; font-weight: 600; border-bottom: 1px solid #dedfd6; }
+.structured-memo-table td { padding: 4px 2px; vertical-align: middle; }
+.structured-memo-table .structured-memo-row-number { font-variant-numeric: tabular-nums; color: #59665d; }
+.structured-memo-group-number { display: inline-grid; place-items: center; min-width: 28px; min-height: 24px; padding: 3px 7px; border-radius: 6px; background: #e4efe7; color: #31553d; font-variant-numeric: tabular-nums; }
+.structured-memo-table input { width: 100%; min-width: 0; min-height: 42px; padding: 8px 9px; font-size: 14px; }
+.structured-memo-table .structured-memo-gap td { position: relative; text-align: right; padding: 0 2px; }
+.structured-memo-gap td::before { content: ""; position: absolute; inset: 50% 0 auto; border-top: 1px dashed #d2d7ce; pointer-events: none; }
+.structured-memo-gap.is-boundary td::before { border-top: 2px solid #9db5a1; }
+.structured-memo-gap button { position: relative; min-height: 36px; padding: 5px 12px; border: 1px solid #d2d7ce; border-radius: 7px; color: #31553d; background: #faf9f5; font-size: 12px; }
+.structured-memo-gap.is-boundary button { background: #e4efe7; border-color: #aac0ad; }
+.structured-memo-empty { display: flex; flex-wrap: wrap; gap: 8px; border: 1px dashed #d2d7ce; border-radius: 9px; padding: 12px; }
+.structured-memo-empty p { width: 100%; margin: 0; font-size: 12px; line-height: 1.65; color: #59665d; }
+.structured-memo-secondary { min-height: 40px; border: 1px solid #9db5a1; border-radius: 8px; padding: 7px 11px; background: #fff; color: #31553d; font-size: 12px; font-weight: 600; justify-self: start; }
+.structured-memo-json { border: 1px solid #d2d7ce; border-radius: 9px; padding: 10px; overflow: hidden; }
+.structured-memo-json summary { color: #31553d; font-size: 13px; font-weight: 700; cursor: pointer; min-height: 34px; line-height: 34px; }
+.structured-memo-json-actions { display: flex; gap: 6px; flex-wrap: wrap; margin: 9px 0; }
+.structured-memo-feedback { font-size: 12px; color: #31553d; margin: 6px 0; }
+.structured-memo-feedback:empty { display: none; }
+.structured-memo .structured-memo-json-text { width: 100%; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; resize: vertical; background: #fff; white-space: pre-wrap; overflow-wrap: anywhere; }
+.structured-memo button:focus-visible, .structured-memo input:focus-visible, .structured-memo textarea:focus-visible, .structured-memo summary:focus-visible { outline: 2px solid #31553d; outline-offset: 2px; }
+@media (max-width: 650px) {
+  .structured-memo-number-col { width: 26px; }
+  .structured-memo-group-col { width: 58px; }
+  .structured-memo-table { font-size: 11px; }
+  .structured-memo-table input, .structured-memo > textarea { font-size: 16px; }
+  .structured-memo-table input { min-height: 44px; }
+  .structured-memo-modes button, .structured-memo-gap button, .structured-memo-secondary { min-height: 44px; }
+  .structured-memo-gap button { padding: 7px 9px; }
+  .structured-memo .structured-memo-json-text { font-size: 16px; }
+}
