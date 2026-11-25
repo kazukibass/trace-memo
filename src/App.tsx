@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { Note, NoteRevision, NoteStatus, ProjectDetail, ProjectSummary } from "../shared/types";
 import { api, downloadBlob } from "./data";
+import StructuredMemoEditor from "./StructuredMemoEditor";
 
 const statusLabel: Record<NoteStatus, string> = { active: "進行中", paused: "保留", done: "完了" };
 const eventLabel: Record<string, string> = {
@@ -21,6 +22,7 @@ function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ProjectDetail | null>(null);
   const [creatingProject, setCreatingProject] = useState(false);
+  const [quickPending, setQuickPending] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null | "new">(null);
   const [history, setHistory] = useState<{ note: Note; revisions: NoteRevision[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,11 +48,29 @@ function App() {
     if (selectedId) await refreshDetail(selectedId);
   }
 
+  async function quickMemo() {
+    if (quickPending) return;
+    setQuickPending(true);
+    try {
+      const existing = await api.projects();
+      const project = existing.find((item) => item.id === selectedId) ?? existing[0]
+        ?? await api.createProject({ name: "受信箱", description: "思いついたことを、まずここに記録する。" });
+      await refreshProjects();
+      setSelectedId(project.id);
+      await refreshDetail(project.id);
+      setEditingNote("new");
+    } catch (value) {
+      setError(String(value));
+    } finally {
+      setQuickPending(false);
+    }
+  }
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand"><span className="brand-mark">T</span><div><strong>Trace Memo</strong><small>work in context</small></div></div>
-        <button className="new-project" onClick={() => setCreatingProject(true)}>＋ 新しいプロジェクト</button>
+        <button className="new-project" aria-label="新しいプロジェクト" onClick={() => setCreatingProject(true)}>＋ 新しいプロジェクト</button>
         <nav className="project-nav" aria-label="プロジェクト">
           <p>PROJECTS</p>
           {projects.map((project) => (
@@ -60,6 +80,14 @@ function App() {
             </button>
           ))}
         </nav>
+        <div className="mobile-project-controls">
+          <select aria-label="プロジェクトを切り替える" value={selectedId ?? ""} onChange={(event) => setSelectedId(event.target.value || null)}>
+            {!projects.length && <option value="">プロジェクトなし</option>}
+            {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
+          </select>
+          <button aria-label="新しいプロジェクトを作成" onClick={() => setCreatingProject(true)}>＋</button>
+          <button aria-label="バックアップを出力" onClick={async () => downloadBlob(await api.exportAll(), `trace-memo-${new Date().toISOString().slice(0, 10)}.json`)}>バックアップ</button>
+        </div>
         <footer>
           <span className="pulse" /> この端末に保存
           <button className="backup-button" onClick={async () => downloadBlob(await api.exportAll(), `trace-memo-${new Date().toISOString().slice(0, 10)}.json`)}>バックアップ</button>
@@ -68,7 +96,7 @@ function App() {
 
       <main>
         {error && <div className="error-banner">{error}<button onClick={() => setError(null)}>×</button></div>}
-        {!detail ? <EmptyWorkspace onCreate={() => setCreatingProject(true)} /> : (
+        {!detail ? <EmptyWorkspace onCreate={() => setCreatingProject(true)} onQuickNote={quickMemo} busy={quickPending} /> : (
           <ProjectView
             project={detail}
             onNewNote={() => setEditingNote("new")}
@@ -96,8 +124,8 @@ function App() {
   );
 }
 
-function EmptyWorkspace({ onCreate }: { onCreate: () => void }) {
-  return <section className="empty-workspace"><span>◫</span><h1>最初のプロジェクトを作る</h1><p>メモだけでなく、判断と作業の経過も残せます。</p><button onClick={onCreate}>プロジェクトを作成</button></section>;
+function EmptyWorkspace({ onCreate, onQuickNote, busy }: { onCreate: () => void; onQuickNote: () => void; busy: boolean }) {
+  return <section className="empty-workspace"><span>◫</span><h1>まず、書いてみる。</h1><p>メモを行ごとに整理して、グループやJSONへ。<br />判断と作業の経過もそのまま残せます。</p><button onClick={onQuickNote} disabled={busy}>{busy ? "準備中…" : "すぐにメモを書く"}</button><button className="empty-secondary" onClick={onCreate}>プロジェクトを作成</button></section>;
 }
 
 function ProjectView({ project, onNewNote, onEditNote, onHistory, onDelete, onEvent }: {
@@ -116,7 +144,7 @@ function ProjectView({ project, onNewNote, onEditNote, onHistory, onDelete, onEv
         <div className="notes-grid">{project.notes.map((note) => <article className="note-card" key={note.id}>
           <div className={`status ${note.status}`}>{statusLabel[note.status]}</div><h3>{note.title}</h3><p>{note.content || "本文はありません"}</p>
           <time>{new Date(note.updatedAt).toLocaleString("ja-JP")}</time>
-          <div className="note-actions"><button onClick={() => onEditNote(note)}>編集</button><button onClick={() => onHistory(note)}>履歴</button><button onClick={async () => downloadBlob(await api.exportNote(note.id), `${note.id}.json`)}>JSON</button><button className="danger" onClick={() => onDelete(note)}>削除</button></div>
+          <div className="note-actions"><button onClick={() => onEditNote(note)}>編集・構造化</button><button onClick={() => onHistory(note)}>履歴</button><button onClick={async () => downloadBlob(await api.exportNote(note.id), `${note.id}.json`)}>履歴JSON</button><button className="danger" onClick={() => onDelete(note)}>削除</button></div>
         </article>)}</div>
         {!project.notes.length && <div className="empty-panel">まだメモがありません。現在地を書き残しましょう。</div>}
       </section>
@@ -134,8 +162,8 @@ function EventComposer({ onSave }: { onSave: (input: { eventType: string; summar
   }}><select name="eventType"><option value="work.progress">進捗</option><option value="decision.made">方針決定</option><option value="work.started">作業開始</option><option value="work.completed">完了</option><option value="note.observation">メモ</option></select><input name="summary" required maxLength={240} placeholder="何が起きた？" /><textarea name="details" placeholder="理由や補足" /><button type="submit">記録する</button></form>}</div>;
 }
 
-function Dialog({ children, onClose }: { children: ReactNode; onClose: () => void }) {
-  return <div className="dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><div className="dialog"><button className="dialog-close" onClick={onClose}>×</button>{children}</div></div>;
+function Dialog({ children, onClose, className = "" }: { children: ReactNode; onClose: () => void; className?: string }) {
+  return <div className="dialog-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><div className={`dialog ${className}`}><button className="dialog-close" type="button" aria-label="閉じる" onClick={onClose}>×</button>{children}</div></div>;
 }
 
 function ProjectDialog({ onClose, onSave }: { onClose: () => void; onSave: (input: { name: string; description: string }) => Promise<void> }) {
@@ -143,7 +171,33 @@ function ProjectDialog({ onClose, onSave }: { onClose: () => void; onSave: (inpu
 }
 
 function NoteDialog({ note, onClose, onSave }: { note: Note | null; onClose: () => void; onSave: (input: { title: string; content: string; status: NoteStatus }) => Promise<void> }) {
-  return <Dialog onClose={onClose}><p className="eyebrow">{note ? "EDIT NOTE" : "NEW NOTE"}</p><h2>{note ? "メモを編集" : "現在地を記録"}</h2><form onSubmit={async (event) => { event.preventDefault(); const data = new FormData(event.currentTarget); await onSave({ title: String(data.get("title")), content: String(data.get("content")), status: String(data.get("status")) as NoteStatus }); }}><label>タイトル<input name="title" required maxLength={120} defaultValue={note?.title} autoFocus /></label><label>本文<textarea name="content" rows={10} defaultValue={note?.content} /></label><label>状態<select name="status" defaultValue={note?.status ?? "active"}><option value="active">進行中</option><option value="paused">保留</option><option value="done">完了</option></select></label><button type="submit">保存する</button></form></Dialog>;
+  const [title, setTitle] = useState(note?.title ?? "");
+  const [content, setContent] = useState(note?.content ?? "");
+  const [status, setStatus] = useState<NoteStatus>(note?.status ?? "active");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const dirty = title !== (note?.title ?? "") || content !== (note?.content ?? "") || status !== (note?.status ?? "active");
+  function closeDraft() {
+    if (saving) return;
+    if (!dirty || confirm("未保存の編集を破棄して閉じますか？")) onClose();
+  }
+  return <Dialog onClose={closeDraft} className="note-dialog"><p className="eyebrow">{note ? "EDIT NOTE" : "NEW NOTE"}</p><h2>{note ? "メモを編集" : "現在地を記録"}</h2>
+    <form onSubmit={async (event) => {
+      event.preventDefault();
+      if (saving) return;
+      setSaving(true);
+      setSaveError("");
+      try { await onSave({ title: title.trim() || "無題のメモ", content, status }); }
+      catch (value) { setSaveError(String(value)); }
+      finally { setSaving(false); }
+    }}>
+      <label>タイトル<input name="title" maxLength={120} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="無題のメモ" /></label>
+      <StructuredMemoEditor title={title.trim() || "無題のメモ"} content={content} onChange={setContent} />
+      <label>状態<select name="status" value={status} onChange={(event) => setStatus(event.target.value as NoteStatus)}><option value="active">進行中</option><option value="paused">保留</option><option value="done">完了</option></select></label>
+      {saveError && <p role="alert" className="note-save-error">{saveError}</p>}
+      <button type="submit" disabled={saving}>{saving ? "保存中…" : "保存する"}</button>
+    </form>
+  </Dialog>;
 }
 
 function HistoryDialog({ note, revisions, onClose }: { note: Note; revisions: NoteRevision[]; onClose: () => void }) {

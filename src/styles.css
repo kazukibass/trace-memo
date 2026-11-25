@@ -36,3 +36,30 @@ main { min-width: 0; }
 
 @media (max-width: 950px) { .app-shell { grid-template-columns: 80px 1fr; }.sidebar { padding: 20px 10px; }.brand { justify-content: center; padding: 0 0 24px; }.brand div, .new-project, .project-nav p, .project-nav button div, .sidebar footer { display: none; }.project-nav button { justify-content: center; padding: 8px; }.content-grid { grid-template-columns: 1fr; }.notes-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 650px) { .app-shell { display: block; }.sidebar { position: sticky; z-index: 5; width: 100%; height: auto; flex-direction: row; align-items: center; padding: 10px 14px; }.brand { padding: 0; }.brand div { display: block; }.brand small { display: none; }.brand-mark { width: 32px; height: 32px; }.project-nav { display: flex; margin: 0 0 0 auto; overflow: auto; }.project-nav button { display: none; }.project-nav button.active { display: flex; }.workspace { padding: 30px 18px 60px; }.workspace-header { display: block; }.workspace-header button { margin-top: 22px; }.metrics { display: grid; grid-template-columns: 1fr 1fr; }.metrics div:last-child { grid-column: 1 / -1; }.notes-grid { grid-template-columns: 1fr; }.dialog { padding: 26px 20px; } }
+
+.mobile-project-controls { display: none; }
+.empty-workspace { padding: 28px; }
+.empty-workspace p { line-height: 1.8; }
+.empty-workspace button { min-height: 44px; }
+.empty-workspace .empty-secondary { margin-top: 10px; color: #31553d; background: transparent; border: 1px solid #b7c7b9; }
+.note-dialog { width: min(840px, 100%); }
+.note-dialog form { gap: 18px; }
+.note-dialog label { font-size: 14px; }
+.note-dialog input, .note-dialog textarea, .note-dialog select { font-size: 16px; }
+.note-dialog .dialog-close { min-width: 44px; min-height: 44px; }
+.note-save-error { color: #7c302e; margin: 0; overflow-wrap: anywhere; }
+.note-actions { flex-wrap: wrap; }
+@media (min-width: 651px) and (max-width: 950px) {
+  .new-project { display: block; width: 100%; font-size: 0; text-align: center; }
+  .new-project::before { content: "＋"; font-size: 23px; }
+}
+@media (max-width: 650px) {
+  .sidebar { flex-wrap: wrap; row-gap: 9px; }
+  .project-nav { display: none; }
+  .mobile-project-controls { display: flex; gap: 8px; width: 100%; }
+  .mobile-project-controls select, .mobile-project-controls button { min-height: 44px; padding: 8px 12px; border: 1px solid #39433b; border-radius: 9px; background: #222923; color: #e8eee9; font-size: 16px; }
+  .mobile-project-controls select { flex: 1; min-width: 0; text-overflow: ellipsis; }
+  .empty-workspace { min-height: 78vh; }
+  .dialog-backdrop { padding: 8px; align-items: start; }
+  .note-dialog { width: 100%; max-height: calc(100dvh - 16px); padding: 20px 14px; }
+}
