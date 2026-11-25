@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { MemoTable } from "./memoTable";
+import KanpeExport from "./KanpeExport";
 import {
   appendMemoTableColumn, appendMemoTableRow, createMemoTable, deleteMemoTableColumn,
   deleteMemoTableRow, isMemoTableContent, memoTableJson, parseMemoTable,
@@ -30,6 +31,7 @@ export function MemoTableEditor({ content, onChange, title }: Props) {
       <button type="button" className="structured-memo-secondary" onClick={() => change(draft)}>
         {content ? "本文を表に変換" : "表を作成"}
       </button>
+      {!content.length && <button type="button" className="structured-memo-secondary" onClick={() => change({ columns: ["時間", "本文"], rows: [["0:00", ""], ["1:00", ""]] })}>Kanpe台本テンプレート</button>}
     </div>;
   }
 
@@ -121,7 +123,7 @@ export function MemoTableEditor({ content, onChange, title }: Props) {
       <label htmlFor={id + "-json"}>出力するJSON</label>
       <textarea id={id + "-json"} readOnly rows={8} value={json ?? ""} placeholder="重複・空欄の列名を修正するとプレビューできます" className="structured-memo-json-text" />
     </details>
-    {/* Per-tool exports can be rendered here with the current table model and title. */}
+    <KanpeExport title={title} table={table} />
   </div>;
 }
 
