@@ -4,6 +4,8 @@
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; min-height: 100vh; }
 button, input, textarea, select { font: inherit; }
+/* Keep form controls readable and avoid iOS focus zoom at every viewport width. */
+input, textarea, select { font-size: 16px; }
 button { cursor: pointer; }
 .app-shell { min-height: 100vh; display: grid; grid-template-columns: 270px 1fr; }
 .sidebar { position: sticky; top: 0; height: 100vh; padding: 26px 18px; display: flex; flex-direction: column; color: #e8eee9; background: #171c18; }
