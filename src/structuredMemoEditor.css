@@ -12,7 +12,7 @@
 .structured-memo-table td { padding: 4px 2px; vertical-align: middle; }
 .structured-memo-table .structured-memo-row-number { font-variant-numeric: tabular-nums; color: #59665d; }
 .structured-memo-group-number { display: inline-grid; place-items: center; min-width: 28px; min-height: 24px; padding: 3px 7px; border-radius: 6px; background: #e4efe7; color: #31553d; font-variant-numeric: tabular-nums; }
-.structured-memo-table input { width: 100%; min-width: 0; min-height: 42px; padding: 8px 9px; font-size: 14px; }
+.structured-memo-table input { width: 100%; min-width: 0; min-height: 42px; padding: 8px 9px; font-size: 16px; }
 .structured-memo-table .structured-memo-gap td { position: relative; text-align: right; padding: 0 2px; }
 .structured-memo-gap td::before { content: ""; position: absolute; inset: 50% 0 auto; border-top: 1px dashed #d2d7ce; pointer-events: none; }
 .structured-memo-gap.is-boundary td::before { border-top: 2px solid #9db5a1; }
@@ -26,7 +26,7 @@
 .structured-memo-json-actions { display: flex; gap: 6px; flex-wrap: wrap; margin: 9px 0; }
 .structured-memo-feedback { font-size: 12px; color: #31553d; margin: 6px 0; }
 .structured-memo-feedback:empty { display: none; }
-.structured-memo .structured-memo-json-text { width: 100%; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; resize: vertical; background: #fff; white-space: pre-wrap; overflow-wrap: anywhere; }
+.structured-memo .structured-memo-json-text { width: 100%; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 16px; resize: vertical; background: #fff; white-space: pre-wrap; overflow-wrap: anywhere; }
 .structured-memo button:focus-visible, .structured-memo input:focus-visible, .structured-memo textarea:focus-visible, .structured-memo summary:focus-visible { outline: 2px solid #31553d; outline-offset: 2px; }
 @media (max-width: 650px) {
   .structured-memo-number-col { width: 26px; }
