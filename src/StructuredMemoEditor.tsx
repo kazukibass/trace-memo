@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useId, useState } from "react";
 import type { MemoRow } from "./structuredMemo";
 import { getMemoRows, memoGroupsJson, toggleMemoBoundary, updateMemoItem } from "./structuredMemo";
+import MemoTableEditor from "./MemoTableEditor";
+import { isMemoTableContent } from "./memoTable";
 import "./structuredMemoEditor.css";
 
 type Props = { content: string; onChange: (text: string) => void; title: string };
@@ -31,7 +33,7 @@ function LineInput({ row, onChange }: { row: MemoRow; onChange: (value: string) 
 }
 
 export function StructuredMemoEditor({ content, onChange, title }: Props) {
-  const [mode, setMode] = useState<"memo" | "groups">("memo");
+  const [mode, setMode] = useState<"memo" | "groups" | "table">(() => isMemoTableContent(content) ? "table" : "memo");
   const [message, setMessage] = useState("");
   const id = useId();
   const rows = getMemoRows(content);
@@ -72,6 +74,7 @@ export function StructuredMemoEditor({ content, onChange, title }: Props) {
       <div className="structured-memo-modes" role="group" aria-label="本文の編集モード">
         <button type="button" aria-pressed={mode === "memo"} onClick={() => setMode("memo")}>メモ</button>
         <button type="button" aria-pressed={mode === "groups"} onClick={() => setMode("groups")}>構造化</button>
+        <button type="button" aria-pressed={mode === "table"} onClick={() => setMode("table")}>表計算</button>
       </div>
     </div>
 
@@ -79,7 +82,10 @@ export function StructuredMemoEditor({ content, onChange, title }: Props) {
       <textarea aria-labelledby={`${id}-label`} aria-describedby={`${id}-help`} rows={10} value={content} onChange={event => change(event.target.value)} />
       <p className="structured-memo-help" id={`${id}-help`}>1行が1項目、空行がグループの区切りになります。自由な文章のままでも保存できます。</p>
       {!content.length && <button type="button" className="structured-memo-secondary" onClick={() => change(exampleText)}>サンプル入力</button>}
-    </> : <>
+    </> : mode === "table" ? <MemoTableEditor content={content} title={title} onChange={change} /> : isMemoTableContent(content) ? <div className="memo-table-intro">
+      <p>このメモは表形式で保存されています。メモモードで本文を確認するか、表計算モードで編集できます。</p>
+      <button type="button" className="structured-memo-secondary" onClick={() => setMode("table")}>表計算モードへ</button>
+    </div> : <>
       <p className="structured-memo-help" id={`${id}-help`}>空行以外の各行を項目にします。区切りの追加・解除で本文に空行を反映します。項目の追加や削除はメモモードで編集できます。</p>
       <p className="structured-memo-count" role="status">{rows.length} 項目 / {groupCount} グループ</p>
       {!rows.length ? <div className="structured-memo-empty">
