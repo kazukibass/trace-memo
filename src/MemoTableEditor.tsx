@@ -1,6 +1,8 @@
 import { useId, useState } from "react";
 import type { MemoTable } from "./memoTable";
 import KanpeExport from "./KanpeExport";
+import MockExamExport from "./MockExamExport";
+import { createMockExamTable } from "./mockExamAdapter";
 import {
   appendMemoTableColumn, appendMemoTableRow, createMemoTable, deleteMemoTableColumn,
   deleteMemoTableRow, isMemoTableContent, memoTableJson, parseMemoTable,
@@ -32,6 +34,7 @@ export function MemoTableEditor({ content, onChange, title }: Props) {
         {content ? "本文を表に変換" : "表を作成"}
       </button>
       {!content.length && <button type="button" className="structured-memo-secondary" onClick={() => change({ columns: ["時間", "本文"], rows: [["0:00", ""], ["1:00", ""]] })}>Kanpe台本テンプレート</button>}
+      {!content.length && <button type="button" className="structured-memo-secondary" onClick={() => change(createMockExamTable())}>Mock Exam問題集テンプレート</button>}
     </div>;
   }
 
@@ -124,6 +127,7 @@ export function MemoTableEditor({ content, onChange, title }: Props) {
       <textarea id={id + "-json"} readOnly rows={8} value={json ?? ""} placeholder="重複・空欄の列名を修正するとプレビューできます" className="structured-memo-json-text" />
     </details>
     <KanpeExport title={title} table={table} />
+    <MockExamExport title={title} table={table} />
   </div>;
 }
 
