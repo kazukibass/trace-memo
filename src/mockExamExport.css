@@ -1,0 +1,10 @@
+/* Same interaction sizes as the table and Kanpe export, including iPhone. */
+.mock-exam-export { min-width: 0; border: 1px solid #d2d7ce; border-radius: 9px; padding: 10px; }
+.mock-exam-export summary { font-size: 14px; min-height: 44px; line-height: 1.6; display: list-item; padding: 10px 0; cursor: pointer; color: #31553d; font-weight: 700; }
+.mock-exam-export p, .mock-exam-export li { font-size: 14px; line-height: 1.6; color: #59665d; }
+.mock-exam-export-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.mock-exam-export select, .mock-exam-export textarea { font-size: 16px; min-width: 0; min-height: 44px; }
+.mock-exam-export-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.mock-exam-export-actions button { min-height: 44px; padding: 7px 12px; border: 1px solid #9db5a1; border-radius: 8px; background: #fff; color: #31553d; font-weight: 600; }
+.mock-exam-export .mock-exam-export-errors { padding-left: 20px; }
+@media (max-width: 650px) { .mock-exam-export-columns { grid-template-columns: 1fr; } }
